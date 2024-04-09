@@ -344,7 +344,12 @@ while True:
             screen.blit(text, (570, 210))
 
         text = font_start.render("Wanna play again ? Press space", True, "Black")
-        screen.blit(text, (68, 280))                    
+        
+        if lost:
+            screen.blit(text, (80, 280))                    
+        
+        if won:
+            screen.blit(text, (345, 280))                  
 
                     
 
