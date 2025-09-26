@@ -1,25 +1,24 @@
-# Import lib
 import pygame
 from time import sleep as sl
 import random
 
-# Setup pygame 
 pygame.init()
 width, height = 1380, 720
 screen = pygame.display.set_mode((width, height))
 clock = pygame.time.Clock()
 cras_logo = pygame.image.load("graphics/logo.jpg")
-icon = pygame.display.set_icon(cras_logo)
-caption = pygame.display.set_caption("Hangman")
+pygame.display.set_icon(cras_logo)
+pygame.display.set_caption("Hangman")
 game_active = True
 
-#Font
-font = pygame.font.SysFont("comicsans", 80)
-font_start = pygame.font.SysFont("comicsans", 55)
+# Font
+font = pygame.font.SysFont("comicsans", 60)
+font_start = pygame.font.SysFont("comicsans", 50)
+font_title = pygame.font.SysFont("comicsans", 25,italic = False)
+font_topic = pygame.font.SysFont("comicsans", 35)
 font_small = pygame.font.SysFont("comicsans", 42)
 
-
-#Letters
+# Letters
 rad = 30
 gap = 10
 letters = []
@@ -31,242 +30,170 @@ for i in range(26):
     y = starty + ((i // 13) * (gap + rad * 2))
     letters.append([x, y, chr(A + i), True])
 
-# Variables
 def var():
-    global guess
-    global choosed
-    global count
-    global limit
-    global topic
-    global topic_choosed
-    global already_guessed
-    global word_tp1
-    global word_tp2
-    global word_tp3
-    global lost
-    global won
+    global guess, choosed, count, limit, topic, topic_choosed
+    global already_guessed, lost, won, word,hint
+    global word_tp
+
     guess = ""
     choosed = False
     count = 0
     limit = 4
-    topic = ["Technology", "Sports", "Foods"]
+    topic = ["Technology", "Sports", "Foods", "Movies", "Mental Health", "Social issues"]
     topic_choosed = ""
     already_guessed = []
-    word_tp1 = [ "programmer", "developer", "wire", "automatic", "machine", "circuit", "router", "cpu", "terminal", "microprocessor", "processor"]
-    word_tp2 = [ "skiing", "sportmanship", "hockey", "rugby", "handball", "offside", "racket", "archery", "wrestling", "hurdling", "polo", "regatta", "dodgeball"]
-    word_tp3 = [ "lolipop", "pudding", "macaroons", "pasta", "olive", "raspberry", "baguette", "salami", "smoothies", "ham", "oysters", "croissants"]
+    hint = 3
+
+    word_tp = {
+        "Technology": ["programmer", "developer", "wire", "automatic", "machine", "circuit", "router", "cpu", "terminal", "microprocessor", "processor"],
+        "Sports": ["skiing", "sportmanship", "hockey", "rugby", "handball", "offside", "racket", "archery", "wrestling", "hurdling", "polo", "regatta", "dodgeball"],
+        "Foods": ["lolipop", "pudding", "macaroons", "pasta", "olive", "raspberry", "baguette", "salami", "smoothies", "ham", "oysters", "croissants"],
+        "Movies": ["inception", "interstellar", "avatar", "gladiator", "parasite", "avengers", "joker", "titanic", "frozen"],
+        "Mental Health": ["anxiety", "therapy", "depression", "stress","meditation", "mindfulness", "bipolar", "resilience"],
+        "Social issues": ["poverty", "racism", "education", "equality", "corruption", "bullying", "violence", "homelessness"]
+    }
+
     lost = False
     won = False
+    word = ""
 
-# Starting
 var()
 clicked = -1
 draw = True
+
 while True:
-    pos = pygame.mouse.get_pos() # Mouse pos
-    # Turn off
+    pos = pygame.mouse.get_pos() 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-             pygame.quit()
-            
-        #Replay
+            pygame.quit()
+
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE and game_active == False:
                 var()
+                letters.clear()
                 for i in range(26):
                     x = startx + gap * 2 + (rad * 2 + gap) * (i % 13)
                     y = starty + ((i // 13) * (gap + rad * 2))
                     letters.append([x, y, chr(A + i), True])
                 draw = True
                 game_active = True
+            #thả hint if player stuck
+            if event.key == pygame.K_h and game_active and topic_choosed != "" and hint > 0:
+                r_letter = [c.upper() for c in word if c.upper() not in already_guessed]
+                if r_letter:
+                    hint_letter = random.choice(r_letter)
+                    already_guessed.append(hint_letter)
+                    hint -= 1
 
-        # Click on letters
-        if event.type == pygame.MOUSEBUTTONDOWN:
+        if event.type == pygame.MOUSEBUTTONDOWN and topic_choosed != "":
             m_x, m_y = pygame.mouse.get_pos()
             for letter in letters:
                 x, y, ltr, visible = letter
                 if visible and draw == True:
-                    dis = ((x - m_x)**2 + (y - m_y)**2) ** 0.5
+                    dis = ((x - m_x) ** 2 + (y - m_y) ** 2) ** 0.5
                     if dis < rad:
-                        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW) 
+                        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
                         letter[3] = False
                         already_guessed.append(ltr)
                         if ltr.lower() not in word:
-                            count += 1  
-            
+                            count += 1
 
-
-    # Bg color
     screen.fill("white")
 
-    # Hints/ logo
     img = pygame.transform.scale(cras_logo, (70, 70))
     hint_box = screen.blit(img, (10, 11))
 
     text = font_small.render("1K/ SLOT", True, "BLACK")
     screen.blit(text, (100, 11))
 
-    # Pressed
     if hint_box.collidepoint(pos):
         if event.type == pygame.MOUSEBUTTONDOWN:
             if pygame.mouse.get_pressed()[1] == True:
                 clicked += 1
-                print("Hints")
                 if clicked == 0:
-                    for letter in word: 
+                    for letter in word:
                         letter = letter.upper()
                         if letter not in already_guessed:
                             already_guessed.append(letter)
                             break
-        
         if event.type == pygame.MOUSEBUTTONUP:
             clicked = -1
 
-                    
     if game_active:
-        # Pick topic
-        if topic_choosed == "" :
-
+        # chọn topic
+        if topic_choosed == "":
             text = font_start.render("Which topic do you want to choose ?", True, "BLACK")
             screen.blit(text, (230, 100))
 
-            tp1 = font_start.render(topic[0], True, "WHITE")
-            tp2 = font_start.render(topic[1], True, "WHITE")
-            tp3 = font_start.render(topic[2], True, "WHITE")
+            topic_rects = []
+            rows, cols = 2, 3
+            button_w, button_h = 250, 82
+            start_x = (width - (cols * button_w + (cols - 1) * 50)) // 2
+            start_y = 250
+            gap_x, gap_y = 50, 150
 
-            # Topic 1 
-            tp1_rect = pygame.Rect(190, 250, 10, 82)
-            screen.blit(tp1, (tp1_rect.x + 10, tp1_rect.y))
-            tp1_rect.w = max(100, tp1.get_width() + 20)
-            pygame.draw.rect(screen, "#475F77", tp1_rect, 0, border_radius= 10)
-            screen.blit(tp1, (tp1_rect.x + 10, tp1_rect.y))
+            for i, t in enumerate(topic):
+                row = i // cols
+                col = i % cols
+                x = start_x + col * (button_w + gap_x)
+                y = start_y + row * gap_y
 
-            if tp1_rect.collidepoint(pos): 
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)         
-                if event.type == pygame.MOUSEBUTTONDOWN :   
-                    screen.blit(tp1, (tp1_rect.x + 10, tp1_rect.y))
-                    tp1_rect.w = max(100, tp1.get_width() + 20)
-                    pygame.draw.rect(screen, "#222D37", tp1_rect, 0, border_radius= 10)
-                    screen.blit(tp1, (tp1_rect.x + 10, tp1_rect.y))
-                    tp2_rect = pygame.Rect(630, 250, 10, 82)
-                    screen.blit(tp2, (tp2_rect.x + 10, tp2_rect.y))
-                    tp2_rect.w = max(100, tp2.get_width() + 20)
-                    pygame.draw.rect(screen, "#475F77", tp2_rect, 0, border_radius= 10)
-                    screen.blit(tp2, (tp2_rect.x + 10, tp2_rect.y))
-                    tp3_rect = pygame.Rect(970, 250, 10, 82)
-                    screen.blit(tp3, (tp3_rect.x + 10, tp3_rect.y))
-                    tp3_rect.w = max(100, tp3.get_width() + 20)
-                    pygame.draw.rect(screen, "#475F77", tp3_rect, 0, border_radius= 10)
-                    screen.blit(tp3, (tp3_rect.x + 10, tp3_rect.y))
-                    pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
-                    pygame.display.flip()
-                    sl(0.15)
-                    topic_choosed = topic[0]
+                text_surface = font_topic.render(t, True, "WHITE")
+                rect = pygame.Rect(x, y, button_w, button_h)
+                pygame.draw.rect(screen, "#475F77", rect, 0, border_radius=10)
+                screen.blit(text_surface, (
+                    rect.x + (button_w - text_surface.get_width()) // 2,
+                    rect.y + (button_h - text_surface.get_height()) // 2
+                ))
 
-            
-                
+                topic_rects.append((rect, t))
 
-            # Topic 2    
-            tp2_rect = pygame.Rect(630, 250, 10, 82)
-            screen.blit(tp2, (tp2_rect.x + 10, tp2_rect.y))
-            tp2_rect.w = max(100, tp2.get_width() + 20)
-            pygame.draw.rect(screen, "#475F77", tp2_rect, 0, border_radius= 10)
-            screen.blit(tp2, (tp2_rect.x + 10, tp2_rect.y))
-            
-            if tp2_rect.collidepoint(pos):  
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
-                if event.type == pygame.MOUSEBUTTONDOWN :   
-                    screen.blit(tp2, (tp2_rect.x + 10, tp2_rect.y))
-                    tp2_rect.w = max(100, tp2.get_width() + 20)
-                    pygame.draw.rect(screen, "#222D37", tp2_rect, 0, border_radius= 10)
-                    screen.blit(tp2, (tp2_rect.x + 10, tp2_rect.y))
-                    tp3_rect = pygame.Rect(970, 250, 10, 82)
-                    screen.blit(tp3, (tp3_rect.x + 10, tp3_rect.y))
-                    tp3_rect.w = max(100, tp3.get_width() + 20)
-                    pygame.draw.rect(screen, "#475F77", tp3_rect, 0, border_radius= 10)
-                    screen.blit(tp3, (tp3_rect.x + 10, tp3_rect.y))
-                    pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
-                    pygame.display.flip()
-                    sl(0.15)
-                    topic_choosed = topic[1]
+            # Event click chọn topic
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                for rect, t in topic_rects:
+                    if rect.collidepoint(pos):
+                        topic_choosed = t
+                        pygame.display.flip()
+                        sl(0.15)
 
-
-
-            # Topic 3
-            tp3_rect = pygame.Rect(970, 250, 10, 82)
-            screen.blit(tp3, (tp3_rect.x + 10, tp3_rect.y))
-            tp3_rect.w = max(100, tp3.get_width() + 20)
-            pygame.draw.rect(screen, "#475F77", tp3_rect, 0, border_radius= 10)
-            screen.blit(tp3, (tp3_rect.x + 10, tp3_rect.y))
-
-            if tp3_rect.collidepoint(pos):
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND) 
-                if event.type == pygame.MOUSEBUTTONDOWN :
-                    screen.blit(tp3, (tp3_rect.x + 10, tp3_rect.y))
-                    tp3_rect.w = max(100, tp3.get_width() + 20)
-                    pygame.draw.rect(screen, "#222D37", tp3_rect, 0, border_radius= 10)
-                    screen.blit(tp3, (tp3_rect.x + 10, tp3_rect.y))
-                    pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
-                    pygame.display.flip()
-                    sl(0.15)
-                    topic_choosed = topic[2]
-            
-            if tp1_rect.collidepoint(pos) == False and tp2_rect.collidepoint(pos) == False and tp3_rect.collidepoint(pos) == False:
+            # Đổi cursor khi hover
+            hovered = False
+            for rect, _ in topic_rects:
+                if rect.collidepoint(pos):
+                    pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                    hovered = True
+                    break
+            if not hovered:
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
-                
-
 
         # Start
-        else: 
+        else:
             if choosed == False:
-                # Random words based on topic
-                if topic_choosed == topic[0]: 
-                    word = random.choice(word_tp1)
-                
-                elif topic_choosed == topic[1]:
-                    word = random.choice(word_tp2)
-
-                elif topic_choosed == topic[2]:
-                    word = random.choice(word_tp3)
+                word = random.choice(word_tp[topic_choosed])
+                choosed = True
 
             word_display = ""
-            choosed = True
 
-            
-
-            #Topic
             dp_topic = font.render("Topic: " + topic_choosed, True, "BLACK")
             screen.blit(dp_topic, (14, 80))
 
-
-            # Gallows
             pygame.draw.rect(screen, (0, 0, 0), [1030, 650, 350, 25], 0)
             pygame.draw.rect(screen, (0, 0, 0), [1192.5, 100, 25, 575], 0)
             pygame.draw.rect(screen, (0, 0, 0), [1030, 100, 162.5, 10], 0)
             pygame.draw.rect(screen, (0, 0, 0), [1030, 108, 10, 110], 0)
 
-
-            #Draw letters
             for letter in letters:
                 x, y, ltr, visible = letter
-                ltr = ltr.lower() #Lowercase
-                
+                ltr = ltr.lower()
                 if visible and draw == True:
                     pygame.draw.circle(screen, "BLACK", (x, y), rad, 3)
                     text = font_small.render(ltr, 1, "BLACK")
-                    screen.blit(text, (x - text.get_width()/2, y - text.get_height()/2)) 
-                
-                
+                    screen.blit(text, (x - text.get_width()/2, y - text.get_height()/2))
                 elif visible == False and ltr in word:
                     pygame.draw.circle(screen, "GREEN", (x, y), rad, 0)
-                    
-
-
                 elif visible == False and ltr not in word:
-                    pygame.draw.circle(screen, "RED", (x, y), rad, 0)    
-                
+                    pygame.draw.circle(screen, "RED", (x, y), rad, 0)
 
-            # Word to guess
             for letter in word:
                 letter = letter.upper()
                 if letter in already_guessed:
@@ -276,51 +203,46 @@ while True:
             dp_word = font.render(word_display, True, "BLACK")
             screen.blit(dp_word, (85, 310))
 
-            # Turns left
-            screen.blit(font_start.render("Turn(s) left: "+ str(limit - count), True, "BLACK"), (880, 10))
+            screen.blit(font_title.render("Turn(s) left: "+ str(limit - count), True, "BLACK"), (880, 10))
+            screen.blit(font_title.render("Hints left: " + str(hint), True, "BLACK"), (880, 60))
+            screen.blit(font_title.render("press H if u want to open hint:D ", True, "BLACK"), (600, 100))            
 
-
-            # Draw hangman
             if count == 1: 
-                pygame.draw.circle(screen, (0, 0, 0), [1035, 261], 43, 7) # Head
-                pygame.draw.circle(screen, (0, 0, 0), [1020, 255], 5, 0) # Eyes
-                pygame.draw.circle(screen, (0, 0, 0), [1050, 255], 5, 0) #
-
+                pygame.draw.circle(screen, (0, 0, 0), [1035, 261], 43, 7) 
+                pygame.draw.circle(screen, (0, 0, 0), [1020, 255], 5, 0) 
+                pygame.draw.circle(screen, (0, 0, 0), [1050, 255], 5, 0)
             elif count == 2:
-                pygame.draw.circle(screen, (0, 0, 0), [1035, 261], 43, 7) # Head
-                pygame.draw.circle(screen, (0, 0, 0), [1020, 255], 5, 0) # Eyes
-                pygame.draw.circle(screen, (0, 0, 0), [1050, 255], 5, 0) #
-                pygame.draw.rect(screen, (0, 0, 0), [1031.5, 303, 7, 100]) # Body
-
+                pygame.draw.circle(screen, (0, 0, 0), [1035, 261], 43, 7) 
+                pygame.draw.circle(screen, (0, 0, 0), [1020, 255], 5, 0)
+                pygame.draw.circle(screen, (0, 0, 0), [1050, 255], 5, 0)
+                pygame.draw.rect(screen, (0, 0, 0), [1031.5, 303, 7, 100])
             elif count == 3:
-                pygame.draw.circle(screen, (0, 0, 0), [1035, 261], 43, 7) # Head
-                pygame.draw.circle(screen, (0, 0, 0), [1020, 255], 5, 0) # Eyes
-                pygame.draw.circle(screen, (0, 0, 0), [1050, 255], 5, 0) #
-                pygame.draw.rect(screen, (0, 0, 0), [1031.5, 303, 7, 100]) # Body
-                pygame.draw.line(screen, (0, 0, 0), (1034, 319), (1092, 362), 7) # Left hand
-                pygame.draw.line(screen, (0, 0, 0), (1034, 319), (971, 362), 7) # Right hand
-            
-
+                pygame.draw.circle(screen, (0, 0, 0), [1035, 261], 43, 7)
+                pygame.draw.circle(screen, (0, 0, 0), [1020, 255], 5, 0)
+                pygame.draw.circle(screen, (0, 0, 0), [1050, 255], 5, 0)
+                pygame.draw.rect(screen, (0, 0, 0), [1031.5, 303, 7, 100])
+                pygame.draw.line(screen, (0, 0, 0), (1034, 319), (1092, 362), 7)
+                pygame.draw.line(screen, (0, 0, 0), (1034, 319), (971, 362), 7)
             elif count == limit: 
-                pygame.draw.circle(screen, (0, 0, 0), [1035, 261], 43, 7) # Head
-                pygame.draw.rect(screen, (0, 0, 0), [1031.5, 303, 7, 100]) # Body
-                pygame.draw.line(screen, (0, 0, 0), (1034, 319), (1092, 362), 7) # Left hand
-                pygame.draw.line(screen, (0, 0, 0), (1034, 319), (971, 362), 7) # Right hand
-                pygame.draw.line(screen, (0, 0, 0), (1034, 400), (1092, 491), 7) # Left leg
-                pygame.draw.line(screen, (0, 0, 0), (1034, 400), (971, 491), 7) # Right leg
+                pygame.draw.circle(screen, (0, 0, 0), [1035, 261], 43, 7)
+                pygame.draw.rect(screen, (0, 0, 0), [1031.5, 303, 7, 100])
+                pygame.draw.line(screen, (0, 0, 0), (1034, 319), (1092, 362), 7)
+                pygame.draw.line(screen, (0, 0, 0), (1034, 319), (971, 362), 7)
+                pygame.draw.line(screen, (0, 0, 0), (1034, 400), (1092, 491), 7)
+                pygame.draw.line(screen, (0, 0, 0), (1034, 400), (971, 491), 7)
                 dead = font_small.render("x x", True, "BLACK")
                 screen.blit(dead, (1004, 220))
 
-                # LOST
                 lost = True
                 draw = False
                 game_active = False
-            
+
             # Win
-            if word_display == word:    
+            if word_display == word:
                 won = True
                 draw = False
                 game_active = False
+
     else:
         letters.clear()
         if lost:
@@ -328,12 +250,12 @@ while True:
             pygame.draw.rect(screen, (0, 0, 0), [1192.5, 100, 25, 575], 0)
             pygame.draw.rect(screen, (0, 0, 0), [1030, 100, 162.5, 10], 0)
             pygame.draw.rect(screen, (0, 0, 0), [1030, 108, 10, 110], 0)
-            pygame.draw.circle(screen, (0, 0, 0), [1035, 261], 43, 7) # Head
-            pygame.draw.rect(screen, (0, 0, 0), [1031.5, 303, 7, 100]) # Body
-            pygame.draw.line(screen, (0, 0, 0), (1034, 319), (1092, 362), 7) # Left hand
-            pygame.draw.line(screen, (0, 0, 0), (1034, 319), (971, 362), 7) # Right hand
-            pygame.draw.line(screen, (0, 0, 0), (1034, 400), (1092, 491), 7) # Left leg
-            pygame.draw.line(screen, (0, 0, 0), (1034, 400), (971, 491), 7) # Right leg
+            pygame.draw.circle(screen, (0, 0, 0), [1035, 261], 43, 7)
+            pygame.draw.rect(screen, (0, 0, 0), [1031.5, 303, 7, 100])
+            pygame.draw.line(screen, (0, 0, 0), (1034, 319), (1092, 362), 7)
+            pygame.draw.line(screen, (0, 0, 0), (1034, 319), (971, 362), 7)
+            pygame.draw.line(screen, (0, 0, 0), (1034, 400), (1092, 491), 7)
+            pygame.draw.line(screen, (0, 0, 0), (1034, 400), (971, 491), 7)
             dead = font_small.render("x x", True, "BLACK")
             screen.blit(dead, (1004, 220))
             text = font_start.render("You've lost, the word is: " + word, True, "RED")
@@ -344,16 +266,10 @@ while True:
             screen.blit(text, (570, 210))
 
         text = font_start.render("Wanna play again ? Press space", True, "Black")
-        
         if lost:
-            screen.blit(text, (80, 280))                    
-        
+            screen.blit(text, (80, 280))
         if won:
-            screen.blit(text, (345, 280))                  
+            screen.blit(text, (345, 280))
 
-                    
-
-                    
-    # Last part
     pygame.display.update()
     clock.tick(60)
