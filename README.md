@@ -8,7 +8,7 @@
 ## 🎯 Mục tiêu dự án 🎯
 Dự án được tạo ra nhằm mục tiêu quảng bá cho Câu lạc bộ cũng như nâng cao trình độ cho các thành viên Ban **Lập trình - Điện tử** của CRAS.
 
-## 🚀 Cách chạy dự án (local)
+## 🚀 Cách chạy dự án (local) 🚀
 Clone repo:
 ```bash
 git clone https://github.com/crascmaclub/Hangman
