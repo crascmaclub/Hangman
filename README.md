@@ -24,11 +24,11 @@ pip install pygame
 ## 🖥️ Công nghệ sử dụng 🖥️
 **Hangman** được viết trên ngôn ngữ lập trình **Python** và sử dụng thư viện **pygame**
 
-## Thành viên tham gia phát triển
+## 👥 Thành viên tham gia phát triển 👥
 + Nguyễn Tất Hưng
 + Nguyễn Chí Huy
 + Trần Thị Ngọc Huyền
 + Tập thể thành viên ban Lập trình - Điện tử
 
-## License
+## 🗒️ License 🗒️
 Dự án được phát triển phục vụ mục đích giáo dục & cộng đồng
