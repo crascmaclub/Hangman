@@ -45,12 +45,12 @@ def var():
     hint = 3
 
     word_tp = {
-        "Technology": ["programmer", "developer", "wire", "automatic", "machine", "circuit", "router", "cpu", "terminal", "microprocessor", "processor"],
-        "Sports": ["skiing", "sportmanship", "hockey", "rugby", "handball", "offside", "racket", "archery", "wrestling", "hurdling", "polo", "regatta", "dodgeball"],
-        "Foods": ["lolipop", "pudding", "macaroons", "pasta", "olive", "raspberry", "baguette", "salami", "smoothies", "ham", "oysters", "croissants"],
-        "Movies": ["inception", "interstellar", "avatar", "gladiator", "parasite", "avengers", "joker", "titanic", "frozen"],
-        "Mental Health": ["anxiety", "therapy", "depression", "stress","meditation", "mindfulness", "bipolar", "resilience"],
-        "Social issues": ["poverty", "racism", "education", "equality", "corruption", "bullying", "violence", "homelessness"]
+        "Technology": [],
+        "Sports": [],
+        "Foods": [],
+        "Movies": [],
+        "Mental Health": [],
+        "Social issues": []
     }
 
     lost = False
@@ -98,12 +98,12 @@ while True:
                         if ltr.lower() not in word:
                             count += 1
 
-    screen.fill("white")
+    screen.fill("WHITE")
 
     img = pygame.transform.scale(cras_logo, (70, 70))
     hint_box = screen.blit(img, (10, 11))
 
-    text = font_small.render("1K/ SLOT", True, "BLACK")
+    text = font_small.render("1K/Hint", True, "BLACK")
     screen.blit(text, (100, 11))
 
     if hint_box.collidepoint(pos):
@@ -153,6 +153,9 @@ while True:
                 for rect, t in topic_rects:
                     if rect.collidepoint(pos):
                         topic_choosed = t
+                        with open("vocab/" + topic_choosed + ".txt", "rt") as file:
+                            for i in file:
+                                word_tp[topic_choosed].append(i.strip())
                         pygame.display.flip()
                         sl(0.15)
 

@@ -1,0 +1,11 @@
+programmer
+developer
+wire
+automatic
+machine
+circuit
+router
+cpu
+terminal
+microprocessor
+processor
