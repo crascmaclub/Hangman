@@ -120,7 +120,7 @@ while True:
             clicked = -1
 
     if game_active:
-        # chọn topic
+        # Chọn topic
         if topic_choosed == "":
             text = font_start.render("Which topic do you want to choose ?", True, "BLACK")
             screen.blit(text, (230, 100))
