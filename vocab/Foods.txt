@@ -11,3 +11,5 @@ ham
 oysters
 croissants
 pho
+Curry
+Waffle
