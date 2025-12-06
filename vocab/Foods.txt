@@ -11,6 +11,8 @@ ham
 oysters
 croissants
 pho
+kimbap
+kimchi
 taffy
 tacos
 nugget
