@@ -12,3 +12,9 @@ oysters
 croissants
 pho
 bread 
+sushi
+kimbap
+kimchi
+taffy
+tacos
+nugget
