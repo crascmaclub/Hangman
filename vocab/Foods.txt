@@ -12,3 +12,5 @@ oysters
 croissants
 pho
 taffy
+tacos
+nugget
