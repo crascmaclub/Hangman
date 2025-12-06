@@ -11,6 +11,8 @@ ham
 oysters
 croissants
 pho
+curry
+waffle
 bread 
 sushi
 kimbap
