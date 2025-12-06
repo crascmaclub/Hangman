@@ -11,5 +11,12 @@ ham
 oysters
 croissants
 pho
-Curry
-Waffle
+curry
+waffle
+bread 
+sushi
+kimbap
+kimchi
+taffy
+tacos
+nugget
